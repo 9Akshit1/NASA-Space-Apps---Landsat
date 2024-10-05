@@ -24,7 +24,6 @@ const App = () => {
   const [location, setLocation] = useState(null);
   const [datasetGrid, setDatasetGrid] = useState([]); // Store multiple datasets for grid
   const [leadTime, setLeadTime] = useState(10); // Default lead time in minutes
-  const [acquisitionInfo, setAcquisitionInfo] = useState([]);
   const [latitude, setLatitude] = useState(''); // State for latitude input
   const [longitude, setLongitude] = useState(''); // State for longitude input
   const [selectedAttribute, setSelectedAttribute] = useState('reflectance'); // Default attribute to display
@@ -34,7 +33,7 @@ const App = () => {
       const datasets = await findDatasetsInArea(latLng.lat, latLng.lng);
       if (datasets && datasets.length === 9) {
         setDatasetGrid(datasets);
-        setAcquisitionInfo((prev) => [...prev, datasets[4]]); // Store info of the closest dataset (middle of the grid)
+        toast.success(datasets.length)
         toast.success(`Found datasets, closest Path: ${datasets[4].wrsPath}, Row: ${datasets[4].wrsRow}`);
       } else {
         toast.error("Not enough datasets found for the given location.");
@@ -190,7 +189,7 @@ const App = () => {
 
         <div style={{ marginTop: '20px' }}>
           <Link to="/results">
-            <button disabled={acquisitionInfo.length === 0}>View Acquisition Data</button>
+            <button disabled={datasetGrid.length === 0}>View Acquisition Data</button>
           </Link>
         </div>
 
@@ -239,10 +238,7 @@ const App = () => {
         )}
         
         <Routes>
-          <Route
-            path="/results"
-            element={<Results acquisitionInfo={acquisitionInfo} />}
-          />
+          <Route path="/results" element={<Results data={datasetGrid} />} />
         </Routes>
       </div>
     </Router>
